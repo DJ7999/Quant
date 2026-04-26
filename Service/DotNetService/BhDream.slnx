@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="BhDream.Application/BhDream.Application.csproj" />
+  <Project Path="BhDream.Domain/BhDream.Domain.csproj" />
+  <Project Path="BhDream.Infrastructure/BhDream.Infrastructure.csproj" />
+  <Project Path="BhDream.WebAPI/BhDream.WebAPI.csproj" />
+</Solution>

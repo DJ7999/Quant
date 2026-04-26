@@ -1,0 +1,88 @@
+
+# =========================
+# 🚀 .NET
+# =========================
+**/bin/
+**/obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build results
+*.dll
+*.exe
+*.pdb
+*.cache
+
+# EF Core migrations artifacts (optional ignore if you regenerate)
+**/Migrations/
+
+# Rider / VS / VSCode
+.vs/
+.idea/
+*.DotSettings.user
+
+# =========================
+# 🌐 React / Node
+# =========================
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Next.js / Vite
+.next/
+out/
+
+# =========================
+# 🐍 Python ML Service
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ML artifacts (IMPORTANT - adjust if you want to version models)
+*.onnx
+*.pt
+*.pth
+*.pkl
+*.joblib
+
+# Logs
+*.log
+
+# =========================
+# 🧠 ML / Data (optional)
+# =========================
+data/
+datasets/
+models/
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
