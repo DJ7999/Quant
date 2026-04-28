@@ -1,0 +1,13 @@
+﻿using BhDream.Application.Dtos;
+using BhDream.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace BhDream.Application.Helpers
+{
+    public interface IOptionHistoryCsvParser
+    {
+        Task<List<OptionHistoryCsvRow>> ParseAsync(Stream stream);
+    }
+}
