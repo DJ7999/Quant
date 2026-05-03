@@ -20,9 +20,13 @@ builder.Services.AddDbContext<QuantDbContext>(options =>
 builder.Services.AddScoped<IOptionHistoryRepository, OptionHistoryRepository>();
 builder.Services.AddScoped<IUnderlyingRepository, UnderlyingRepository>();
 builder.Services.AddScoped<IOptionContractRepository, OptionContractRepository>();
+builder.Services.AddScoped<IRiskFreeRateRepository, RiskFreeRateRepository>();
+builder.Services.AddScoped<IOptionsAnalyticsService, OptionsAnalyticsService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IOptionCsvImportService, OptionCsvImportService>();
+builder.Services.AddScoped<IRfrCsvImportService, RfrCsvImportService>();
 builder.Services.AddScoped<IOptionHistoryCsvParser, OptionHistoryCsvParser>();
+builder.Services.AddScoped<IRfrCsvParser, RfrCsvParser>();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>

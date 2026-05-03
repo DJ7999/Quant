@@ -8,6 +8,7 @@ namespace BhDream.Infrastructure.Persistence
         public DbSet<Underlying> Underlyings => Set<Underlying>();
         public DbSet<OptionContract> OptionContracts => Set<OptionContract>();
         public DbSet<OptionHistory> OptionHistories => Set<OptionHistory>();
+        public DbSet<RiskFreeRate> RiskFreeRate => Set<RiskFreeRate>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

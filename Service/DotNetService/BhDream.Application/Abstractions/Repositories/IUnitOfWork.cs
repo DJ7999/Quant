@@ -10,5 +10,6 @@ namespace BhDream.Application.Abstractions.Repositories
         public IUnderlyingRepository UnderlyingRepository { get; set; }
         public IOptionContractRepository OptionContractRepository { get; set; }
         public IOptionHistoryRepository OptionHistoryRepository { get; set; }
+        public IRiskFreeRateRepository RiskFreeRateRepository { get; set; }
     }
 }

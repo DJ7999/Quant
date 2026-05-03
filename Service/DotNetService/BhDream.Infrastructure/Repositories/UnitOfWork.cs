@@ -14,17 +14,20 @@ namespace BhDream.Infrastructure.Repositories
         public IOptionHistoryRepository OptionHistoryRepository { get; set; }
         public IUnderlyingRepository UnderlyingRepository { get; set; }
         public IOptionContractRepository OptionContractRepository { get; set; }
+        public IRiskFreeRateRepository RiskFreeRateRepository { get; set; }
 
         public UnitOfWork(
             QuantDbContext context,
             IOptionHistoryRepository optionHistoryRepository,
             IUnderlyingRepository underlyingRepository,
-            IOptionContractRepository optionContractRepository)
+            IOptionContractRepository optionContractRepository,
+            IRiskFreeRateRepository riskFreeRateRepository)
         {
             _context = context;
             OptionHistoryRepository = optionHistoryRepository;
             UnderlyingRepository = underlyingRepository;
             OptionContractRepository = optionContractRepository;
+            RiskFreeRateRepository = riskFreeRateRepository;
         }
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

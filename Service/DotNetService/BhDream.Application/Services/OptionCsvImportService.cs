@@ -30,13 +30,14 @@ namespace BhDream.Application.Services
 
             // 2. preload/create all underlyings used in the file (one round-trip per distinct symbol)
             var underlyingCache = await PreloadUnderlyingsAsync(uniqueRows);
+            Console.WriteLine("underlying done");
 
             // 3. preload/create option contracts (one round-trip per distinct contract)
             var contractCache = await PreloadOptionContractsAsync(uniqueRows, underlyingCache);
-
+            Console.WriteLine("contractCache done");
             // 4. process histories in batches using caches
             var result = await ProcessHistoriesAsync(uniqueRows, underlyingCache, contractCache);
-
+            Console.WriteLine("Histories done");
             return result;
         }
 
@@ -215,10 +216,12 @@ namespace BhDream.Application.Services
                 if (!seenHistoryByContractDate.Add(historyKey))
                     continue; // duplicate history in same file
 
+                var addList = new List<OptionHistory>();
                 var existing = await _unitOfWork.OptionHistoryRepository.GetOptionHistoryAsync(row);
                 if (existing == null)
                 {
-                    await _unitOfWork.OptionHistoryRepository.AddAsync(row);
+                    addList.Add(row);
+                    
                     inserted++;
                 }
                 else
@@ -232,8 +235,9 @@ namespace BhDream.Application.Services
                 processed++;
                 if (processed % HistorySaveBatchSize == 0)
                 {
+                    await _unitOfWork.OptionHistoryRepository.AddRangeAsync(addList);
                     await _unitOfWork.SaveChangesAsync();
-                    //Console.WriteLine($"remaining = {rows.Count-processed}");
+                    Console.WriteLine($"remaining = {rows.Count-processed}");
                 }
             }
 

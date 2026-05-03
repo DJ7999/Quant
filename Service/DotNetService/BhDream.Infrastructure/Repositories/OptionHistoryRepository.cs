@@ -71,5 +71,18 @@ namespace BhDream.Infrastructure.Repositories
                 e.ContractId == entity.ContractId
             );
         }
+
+        public async Task AddRangeAsync(List<OptionHistory> entities)
+        {
+            if (entities == null || !entities.Any())
+                return;
+
+            await _context.OptionHistories.AddRangeAsync(entities);
+        }
+
+        public Task UpdateRangeAsync(List<OptionHistory> entity)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
