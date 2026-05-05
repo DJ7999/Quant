@@ -15,9 +15,6 @@
 *.pdb
 *.cache
 
-# EF Core migrations artifacts (optional ignore if you regenerate)
-**/Migrations/
-
 # Rider / VS / VSCode
 .vs/
 .idea/
@@ -86,3 +83,14 @@ models/
 # =========================
 .DS_Store
 Thumbs.db
+
+# Ignore build output and intermediate files globally
+[Xx]64/
+[Dd]ebug/
+[Rr]elease/
+
+# Ignore local Visual Studio user settings
+*.vcxproj.user
+
+# Ignore the hidden .vs folder (where IntelliSense data lives)
+.vs/

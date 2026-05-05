@@ -9,5 +9,6 @@ namespace BhDream.Domain.Entities
         public required DateTime Date { get; set; }
         public required decimal Rate { get; set; }
         public required string Tenor { get; set; }
+        public string Market { get; set; } = "India";
     }
 }
