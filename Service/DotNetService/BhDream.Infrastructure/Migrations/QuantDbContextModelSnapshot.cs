@@ -105,6 +105,54 @@ namespace BhDream.Infrastructure.Migrations
                     b.ToTable("OptionHistories");
                 });
 
+            modelBuilder.Entity("BhDream.Domain.Entities.OptionPricingParameterSnapshot", b =>
+                {
+                    b.Property<decimal>("Close")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ContractCorrelationId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Expiry")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OptionHistoryCorrelationId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OptionType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RfrMarket")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RfrTenorDays")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("RiskFreeRateValue")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("StrikePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("UnderlyingValue")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("TEXT");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("View_OptionPricingParameterSnapshots", (string)null);
+                });
+
             modelBuilder.Entity("BhDream.Domain.Entities.RiskFreeRate", b =>
                 {
                     b.Property<DateTime>("Date")
