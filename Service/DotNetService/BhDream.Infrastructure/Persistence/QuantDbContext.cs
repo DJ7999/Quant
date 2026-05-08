@@ -11,6 +11,8 @@ namespace BhDream.Infrastructure.Persistence
         public DbSet<RiskFreeRate> RiskFreeRate => Set<RiskFreeRate>();
         public DbSet<OptionPricingParameterSnapshot> OptionPricingParameterSnapshots => Set<OptionPricingParameterSnapshot>();
 
+        public DbSet<OptionGreeksAndIv> OptionGreeksAndIvs => Set<OptionGreeksAndIv>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

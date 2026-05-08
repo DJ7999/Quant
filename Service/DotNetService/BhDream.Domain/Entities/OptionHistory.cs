@@ -33,5 +33,9 @@ namespace BhDream.Domain.Entities
         public decimal? ChangeInUnderlyingValue { get; set; }
 
         public decimal? UnderlyingValue { get; set; }
+
+        public DateTime UpdatedAt {  get; set; } = DateTime.UtcNow;
+
+        public DateTime? ProcessedAt { get; set; } = null;
     } 
 }

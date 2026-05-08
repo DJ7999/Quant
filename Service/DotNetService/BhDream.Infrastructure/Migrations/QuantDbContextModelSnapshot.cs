@@ -44,6 +44,53 @@ namespace BhDream.Infrastructure.Migrations
                     b.ToTable("OptionContracts");
                 });
 
+            modelBuilder.Entity("BhDream.Domain.Entities.OptionGreeksAndIv", b =>
+                {
+                    b.Property<Guid>("ContractId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OptionHistoryId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RfrMarket")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RfrTenor")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CalculatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("Delta")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("Gamma")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("ImpliedVolatility")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("Rho")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("Theta")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("Vega")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("Vomma")
+                        .HasColumnType("REAL");
+
+                    b.HasKey("ContractId", "OptionHistoryId", "RfrMarket", "RfrTenor");
+
+                    b.HasIndex("OptionHistoryId", "ContractId");
+
+                    b.ToTable("OptionGreeksAndIvs");
+                });
+
             modelBuilder.Entity("BhDream.Domain.Entities.OptionHistory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -111,18 +158,16 @@ namespace BhDream.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ContractCorrelationId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Expiry")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("OptionHistoryCorrelationId")
-                        .IsRequired()
+                    b.Property<Guid>("OptionContractId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OptionHistoryId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OptionType")
@@ -130,6 +175,10 @@ namespace BhDream.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("RfrMarket")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RfrTenor")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -207,6 +256,25 @@ namespace BhDream.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Underlying");
+                });
+
+            modelBuilder.Entity("BhDream.Domain.Entities.OptionGreeksAndIv", b =>
+                {
+                    b.HasOne("BhDream.Domain.Entities.OptionContract", "Contract")
+                        .WithMany()
+                        .HasForeignKey("ContractId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BhDream.Domain.Entities.OptionHistory", "OptionHistory")
+                        .WithMany()
+                        .HasForeignKey("OptionHistoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contract");
+
+                    b.Navigation("OptionHistory");
                 });
 
             modelBuilder.Entity("BhDream.Domain.Entities.OptionHistory", b =>
