@@ -35,7 +35,7 @@ namespace Quant {
 	double BsCalculator::CalculateVega(double S, double K, double T, double r, double sigma) {
 		if (T <= 0) return 0.0;
 		double d1 = CalculateD1(S, K, T, r, sigma);
-		return S * NormalPDF(d1) * std::sqrt(T);
+		return (S * NormalPDF(d1) * std::sqrt(T))/100;
 	}
 
 	double BsCalculator::CalculateVomma(double S, double K, double T, double r, double sigma) {
@@ -47,12 +47,14 @@ namespace Quant {
 	}
 
 	double BsCalculator::CalculateDelta(double S, double K, double T, double r, double sigma, bool isCall) {
+		if (T <= 0) return isCall ? (S >= K ? 1.0 : 0.0) : (S <= K ? -1.0 : 0.0);
 		double d1 = CalculateD1(S, K, T, r, sigma);
 		double cdfD1 = NormalCDF(d1);
 		return isCall ? cdfD1 : (cdfD1 - 1);
 	}
 
 	double BsCalculator::CalculateGamma(double S, double K, double T, double r, double sigma) {
+		if (T <= 0 || sigma <= 0 || S <= 0) return 0.0;
 		double d1 = CalculateD1(S, K, T, r, sigma);
 		double pdfD1 = NormalPDF(d1);
 		return pdfD1 / (S * sigma * std::sqrt(T));
@@ -69,6 +71,7 @@ namespace Quant {
 	}
 
 	double BsCalculator::CalculateRho(double S, double K, double T, double r, double sigma, bool isCall) {
+		if (T <= 0) return 0.0;
 		double d1 = CalculateD1(S, K, T, r, sigma);
 		double d2 = CalculateD2(d1, sigma, T);
 		return (isCall ? 1 : -1) * K * T * std::exp(-r * T) * NormalCDF((isCall ? 1 : -1) * d2) / 100;

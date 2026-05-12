@@ -3,6 +3,7 @@ using System;
 using BhDream.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BhDream.Infrastructure.Migrations
 {
     [DbContext(typeof(QuantDbContext))]
-    partial class QuantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260508172319_UpdateView_OptionPricingParameterSnapShot")]
+    partial class UpdateView_OptionPricingParameterSnapShot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
@@ -60,50 +63,29 @@ namespace BhDream.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
-                    b.Property<double>("BenchMarkDelta")
-                        .HasColumnType("decimal(18,6)");
-
-                    b.Property<double>("BenchMarkGamma")
-                        .HasColumnType("decimal(18,6)");
-
-                    b.Property<double>("BenchMarkImpliedVolatility")
-                        .HasColumnType("decimal(18,6)");
-
-                    b.Property<double>("BenchMarkRho")
-                        .HasColumnType("decimal(18,6)");
-
-                    b.Property<double>("BenchMarkTheta")
-                        .HasColumnType("decimal(18,6)");
-
-                    b.Property<double>("BenchMarkVega")
-                        .HasColumnType("decimal(18,6)");
-
-                    b.Property<double>("BenchMarkVomma")
-                        .HasColumnType("decimal(18,6)");
-
                     b.Property<DateTime>("CalculatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<double>("Delta")
-                        .HasColumnType("decimal(18,6)");
+                        .HasColumnType("REAL");
 
                     b.Property<double>("Gamma")
-                        .HasColumnType("decimal(18,6)");
+                        .HasColumnType("REAL");
 
                     b.Property<double>("ImpliedVolatility")
-                        .HasColumnType("decimal(18,6)");
+                        .HasColumnType("REAL");
 
                     b.Property<double>("Rho")
-                        .HasColumnType("decimal(18,6)");
+                        .HasColumnType("REAL");
 
                     b.Property<double>("Theta")
-                        .HasColumnType("decimal(18,6)");
+                        .HasColumnType("REAL");
 
                     b.Property<double>("Vega")
-                        .HasColumnType("decimal(18,6)");
+                        .HasColumnType("REAL");
 
                     b.Property<double>("Vomma")
-                        .HasColumnType("decimal(18,6)");
+                        .HasColumnType("REAL");
 
                     b.HasKey("ContractId", "OptionHistoryId", "RfrMarket", "RfrTenor");
 

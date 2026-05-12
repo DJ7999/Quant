@@ -10,8 +10,9 @@ namespace BhDream.Infrastructure.Persistence
         public DbSet<OptionHistory> OptionHistories => Set<OptionHistory>();
         public DbSet<RiskFreeRate> RiskFreeRate => Set<RiskFreeRate>();
         public DbSet<OptionPricingParameterSnapshot> OptionPricingParameterSnapshots => Set<OptionPricingParameterSnapshot>();
-
         public DbSet<OptionGreeksAndIv> OptionGreeksAndIvs => Set<OptionGreeksAndIv>();
+        public DbSet<OptionHistoryRfrSync> OptionHistoryRfrSync => Set<OptionHistoryRfrSync>();
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -20,6 +20,14 @@ namespace BhDream.Domain.Entities
         public double Rho { get; set; }
         public double Vomma { get; set; }
         public double ImpliedVolatility { get; set; }
-        public DateTime CalculatedAt { get; set; }
+        public DateTime CalculatedAt { get; set; } = DateTime.Now;
+
+        public double BenchMarkDelta { get; set; }
+        public double BenchMarkTheta { get; set; }
+        public double BenchMarkGamma { get; set; }
+        public double BenchMarkVega { get; set; }
+        public double BenchMarkRho { get; set; }
+        public double BenchMarkVomma { get; set; }
+        public double BenchMarkImpliedVolatility { get; set; }
     }
 }

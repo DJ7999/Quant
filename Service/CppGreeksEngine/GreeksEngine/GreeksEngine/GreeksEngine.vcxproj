@@ -70,6 +70,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -102,6 +105,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)Generated;$(ProjectDir)Src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,11 +128,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Generated\pricing.pb.cc" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Src\Apps\GreeksWorker.cpp" />
+    <ClCompile Include="Src\Quant\LbrBenchmarkIvCalculator.cpp" />
+    <ClCompile Include="Src\Quant\QlibBenchmarkBsCalculator.cpp" />
+    <ClCompile Include="Src\Quant\BsCalculator.cpp" />
+    <ClCompile Include="Src\Quant\IvCalculator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\BsCalculator.h" />
-    <ClInclude Include="Include\IvCalculator.hpp" />
+    <ClInclude Include="Generated\pricing.pb.h" />
+    <ClInclude Include="Src\Apps\GreeksWorker.h" />
+    <ClInclude Include="Src\Messaging\PipelineManager.h" />
+    <ClInclude Include="Src\Quant\LbrBenchmarkIvCalculator.h" />
+    <ClInclude Include="Src\Quant\QlibBenchmarkBsCalculator.h" />
+    <ClInclude Include="Src\Quant\BsCalculator.h" />
+    <ClInclude Include="Src\Quant\IvCalculator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Proto\pricing.proto" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

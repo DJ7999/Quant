@@ -15,6 +15,13 @@
 *.pdb
 *.cache
 
+# Ignore the heavy compiled binaries
+vcpkg_installed/
+
+# Do NOT ignore these:
+# !vcpkg.json
+# !vcpkg-configuration.json
+
 # Rider / VS / VSCode
 .vs/
 .idea/

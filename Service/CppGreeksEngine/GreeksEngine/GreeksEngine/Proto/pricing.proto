@@ -1,0 +1,53 @@
+syntax = "proto3";
+package bh_dream;
+option csharp_namespace = "BhDream.Infrastructure.Protobuf";
+
+message OptionRequestSnapshotProto{
+	string option_history_id = 1;
+	string contract_id = 2;
+	string rfr_market = 3;
+	string rfr_tenor = 4;
+
+	double underlying_value = 5;
+	double strike_price = 6;
+	double option_price_close = 7;
+	double risk_free_rate = 8;
+	double time_to_expiry = 9;
+	bool is_call = 10;
+}
+
+message OptionBatchRequestProto{
+	string batch_id = 1; 
+	repeated OptionRequestSnapshotProto option_request_snapshots = 2;
+}
+
+message OptionGreeksResultSnapshotProto{
+	string option_history_id = 1;
+	string contract_id = 2;
+	string rfr_market = 3;
+	string rfr_tenor = 4;
+
+	double delta = 5;
+    double gamma = 6;
+    double vega = 7;
+    double theta = 8;
+    double rho = 9;
+    double vomma = 10;
+    double implied_volatility = 11;
+	BenchmarkResultProto benchmark_result = 12;
+}
+    
+message BenchmarkResultProto {
+    double delta = 1;
+    double gamma = 2;
+    double vega = 3;
+    double theta = 4;
+    double rho = 5;
+    double vomma = 6;
+    double implied_volatility = 7;
+}
+
+message OptionGreeksBatchResultProto{
+	string batch_id = 1; 
+	repeated OptionGreeksResultSnapshotProto option_greeks_result_snapshots = 2;
+}
