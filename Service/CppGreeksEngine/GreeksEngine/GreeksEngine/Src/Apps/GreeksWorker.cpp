@@ -24,7 +24,14 @@ namespace Apps {
         bool isCall = req.is_call();
 
         // 1. Calculate Implied Volatility
-        double sigma = Quant::IvCalculator::CalculateImpliedVolatility(S, K, T, r, req.option_price_close(), isCall);
+        double sigma = Quant::IvCalculator::CalculateImpliedVolatility(
+            req.option_price_close(), // 1. marketPrice
+            S,                        // 2. underlyingPrice
+            K,                        // 3. strikePrice
+            T,                        // 4. timeToMaturity
+            r,                        // 5. riskFreeRate
+            isCall                    // 6. isCall
+        );
 
         // 2. Calculate Primary Greeks
         res->set_delta(Quant::BsCalculator::CalculateDelta(S, K, T, r, sigma, isCall));

@@ -1,5 +1,7 @@
 ﻿using BhDream.Application.Abstractions.Repositories;
+using BhDream.Application.Dtos;
 using BhDream.Domain.Entities;
+using BhDream.Domain.Enums;
 using BhDream.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -83,6 +85,17 @@ namespace BhDream.Infrastructure.Repositories
         public Task UpdateRangeAsync(List<OptionHistory> entity)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<List<OptionHistory>> GetOptionHistoryForContractAsync(OptionContractDto entity)
+        {
+             return await _context.OptionHistories
+                .Include(h => h.Contract)
+                .Where(h => h.Contract.Underlying.Symbol.ToUpper() == entity.Underlying.ToUpper()
+                            && h.Contract.Expiry.Date == entity.ExpirationDate.Value.Date
+                            && h.Contract.StrikePrice == entity.StrikePrice
+                            && h.Contract.OptionType == Enum.Parse<OptionRightType>(entity.OptionType,true))
+                .ToListAsync();
         }
     }
 }

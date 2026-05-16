@@ -6,6 +6,7 @@
 
 namespace Quant {
 	double IvCalculator::CalculateImpliedVolatility(double marketPrice, double underlyingPrice, double strikePrice, double timeToMaturity, double riskFreeRate, bool isCall) {
+		riskFreeRate = riskFreeRate / 100.0; // Convert percentage to decimal
 		// 1. Calculate the Present Value of the Strike
 		// We use exp(-r * T) to bring the future strike price to today's dollars
 		double discountedK = strikePrice * std::exp(-riskFreeRate * timeToMaturity);

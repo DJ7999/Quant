@@ -1,4 +1,5 @@
-﻿using BhDream.Domain.Entities;
+﻿using BhDream.Application.Dtos;
+using BhDream.Domain.Entities;
 
 namespace BhDream.Application.Abstractions.Repositories
 {
@@ -9,5 +10,6 @@ namespace BhDream.Application.Abstractions.Repositories
         Task UpdateAsync(OptionHistory entity);
         Task UpdateRangeAsync(List<OptionHistory> entity);
         Task<OptionHistory?> GetOptionHistoryAsync(OptionHistory entity);
+        Task<List<OptionHistory>> GetOptionHistoryForContractAsync(OptionContractDto entity);
     }
 }

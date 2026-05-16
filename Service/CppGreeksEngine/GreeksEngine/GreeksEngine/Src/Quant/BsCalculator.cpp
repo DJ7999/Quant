@@ -13,6 +13,7 @@ namespace Quant {
 	}
 
 	double BsCalculator::CalculateD1(double S, double K, double T, double r, double sigma) {
+		if (sigma < 1e-7 || T < 1e-7) return 0.0;
 		return (log(S / K) + (r + 0.5 * sigma * sigma) * T) / (sigma * sqrt(T));
 	}
 
@@ -35,7 +36,7 @@ namespace Quant {
 	double BsCalculator::CalculateVega(double S, double K, double T, double r, double sigma) {
 		if (T <= 0) return 0.0;
 		double d1 = CalculateD1(S, K, T, r, sigma);
-		return (S * NormalPDF(d1) * std::sqrt(T))/100;
+		return (S * NormalPDF(d1) * std::sqrt(T));
 	}
 
 	double BsCalculator::CalculateVomma(double S, double K, double T, double r, double sigma) {
@@ -74,6 +75,6 @@ namespace Quant {
 		if (T <= 0) return 0.0;
 		double d1 = CalculateD1(S, K, T, r, sigma);
 		double d2 = CalculateD2(d1, sigma, T);
-		return (isCall ? 1 : -1) * K * T * std::exp(-r * T) * NormalCDF((isCall ? 1 : -1) * d2) / 100;
+		return (isCall ? 1 : -1) * K * T * std::exp(-r * T) * NormalCDF((isCall ? 1 : -1) * d2);
 	}
 }

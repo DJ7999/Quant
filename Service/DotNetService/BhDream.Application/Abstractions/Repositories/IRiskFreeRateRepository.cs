@@ -9,6 +9,6 @@ namespace BhDream.Application.Abstractions.Repositories
     {
         Task InsertAsync(List<RiskFreeRate> riskFreeRates);
         Task<List<RiskFreeRate>> GetRiskFreeRateInRange(DateTime startDate, DateTime endDate);
-        
+        Task<List<string>> GetDistinctTenor();
     }
 }

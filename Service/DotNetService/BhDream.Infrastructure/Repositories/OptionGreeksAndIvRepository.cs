@@ -1,5 +1,7 @@
 ﻿using BhDream.Application.Abstractions.Repositories;
+using BhDream.Application.Dtos;
 using BhDream.Domain.Entities;
+using BhDream.Domain.Enums;
 using BhDream.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -69,5 +71,37 @@ namespace BhDream.Infrastructure.Repositories
             }
             await _context.OptionGreeksAndIvs.AddRangeAsync(newRecords);
         }
+
+        public async Task<List<OptionGreeksAndIv>> GetOptionGreeksAndIvForContractAsync(OptionContractDto contractFilter, string tenor)
+        {
+            // 1. Prepare safe casing variables outside the database context execution
+            string underlyingFilter = contractFilter.Underlying?.Trim().ToLower() ?? "";
+
+            // 2. Safely parse the incoming string filter into your OptionType Enum wrapper
+            // Replace 'OptionType' here with the actual name of your Enum if it differs (e.g., OptionTypeEnum)
+            bool hasValidEnum = Enum.TryParse<OptionRightType>(contractFilter.OptionType, true, out var parsedEnum);
+
+            return await _context.OptionGreeksAndIvs
+                .Include(o => o.Contract)
+                .Include(o => o.OptionHistory)
+                .Where(o =>
+                    // Underlying Symbol Filter
+                    (underlyingFilter == "" || o.Contract.Underlying.Symbol.ToLower() == underlyingFilter) &&
+
+                    // Enum Filter: If no option type string was provided, ignore it. 
+                    // If it was provided and successfully parsed, compare directly using standard strongly typed operators.
+                    (string.IsNullOrEmpty(contractFilter.OptionType) || (hasValidEnum && o.Contract.OptionType == parsedEnum)) &&
+
+                    // Strike Price Filter
+                    (!contractFilter.StrikePrice.HasValue || o.Contract.StrikePrice == contractFilter.StrikePrice.Value) &&
+
+                    // Expiration Date Filter
+                    (!contractFilter.ExpirationDate.HasValue || o.Contract.Expiry == contractFilter.ExpirationDate.Value) &&
+                    (!string.IsNullOrEmpty(tenor) || o.RfrTenor.ToUpper() == tenor.ToUpper())
+                )
+                .ToListAsync();
+        }
+
+        
     }
 }

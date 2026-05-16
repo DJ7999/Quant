@@ -25,6 +25,11 @@ namespace BhDream.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<string>> GetDistinctTenor()
+        {
+            return await _context.RiskFreeRate.Select(r => r.Tenor).Distinct().ToListAsync();
+        }
+
         public async Task InsertAsync(List<RiskFreeRate> riskFreeRates)
         {
             if (riskFreeRates == null)

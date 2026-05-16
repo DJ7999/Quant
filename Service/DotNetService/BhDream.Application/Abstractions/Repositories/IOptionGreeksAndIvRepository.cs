@@ -1,4 +1,5 @@
-﻿using BhDream.Domain.Entities;
+﻿using BhDream.Application.Dtos;
+using BhDream.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,5 +12,6 @@ namespace BhDream.Application.Abstractions.Repositories
         /// Adds a batch of option greeks and IV results to the database.
         /// </summary>
         Task AddUpdateOptionGreeksAndIvBatch(List<OptionGreeksAndIv> results);
+        Task<List<OptionGreeksAndIv>> GetOptionGreeksAndIvForContractAsync(OptionContractDto contractFilter, string tenor = "");
     }
 }

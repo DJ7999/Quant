@@ -14,7 +14,23 @@ export const api = {
       const error = await response.json().catch(() => ({ message: 'Server Error' }));
       throw new Error(error.message || `HTTP error! status: ${response.status}`);
     }
-    console.log(response.json)
+    return response.json();
+  },
+
+  // Generic POST helper for JSON data
+  post: async (endpoint, data) => {
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Server Error' }));
+      throw new Error(error.message || `HTTP error! status: ${response.status}`);
+    }
     return response.json();
   },
 

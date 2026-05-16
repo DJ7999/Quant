@@ -27,5 +27,25 @@ namespace BhDream.Application.Dtos
         public decimal? ChangeInUnderlyingValue { get; set; }
 
         public decimal? UnderlyingValue { get; set; }
+
+        public static OptionHistoryDto FromEntity(OptionHistory history)
+        {
+            return new OptionHistoryDto
+            {
+                Date = history.Date,
+                Open = history.Open,
+                High = history.High,
+                Low = history.Low,
+                Close = history.Close,
+                Ltp = history.Ltp,
+                SettlePrice = history.SettlePrice,
+                NumberOfContracts = history.NumberOfContracts,
+                Turnover = history.Turnover,
+                PremiumTurnover = history.PremiumTurnover,
+                OpenInterest = history.OpenInterest,
+                ChangeInUnderlyingValue = history.ChangeInUnderlyingValue,
+                UnderlyingValue = history.UnderlyingValue
+            };
+        }
     }
 }

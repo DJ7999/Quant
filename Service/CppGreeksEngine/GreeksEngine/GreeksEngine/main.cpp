@@ -5,6 +5,8 @@
 #include <vector>
 #include <Messaging/PipelineManager.h>
 #include <Apps/GreeksWorker.h>
+#include "Quant/IvCalculator.h"
+#include <iomanip>
 
 // We use std::atomic to ensure thread-safety across the app
 std::atomic<bool> globalRunning{ true };
@@ -21,6 +23,7 @@ int main() {
     std::signal(SIGINT, handleManualStop);
 
     Messaging::PipelineConfig pipeline;
+   
 
     try {
         // Connect to your C# endpoints
