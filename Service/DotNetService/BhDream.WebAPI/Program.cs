@@ -1,6 +1,7 @@
 using BhDream.Application.Abstractions.ExternalServices;
 using BhDream.Application.Abstractions.Repositories;
 using BhDream.Application.Helpers;
+using BhDream.Application.ML.Features;
 using BhDream.Application.Services;
 using BhDream.Application.Services.Contracts;
 using BhDream.Infrastructure.ExternalServices.Messaging;
@@ -34,6 +35,7 @@ builder.Services.AddScoped<IRfrCsvParser, RfrCsvParser>();
 builder.Services.AddScoped<IOptionsAnalyticsService, OptionsAnalyticsService>();
 builder.Services.AddScoped<IOptionProcessingService, OptionProcessingService>();
 
+builder.Services.AddSingleton<IFeatureRegistry, FeatureRegistry>();
 builder.Services.AddSingleton<IOptionPricingDispatcher, ZmqOptionPricingDispatcher>();
 builder.Services.AddSingleton<IOptionGreeksResultReceiver, ZmqOptionGreeksResultReceiver>();
 builder.Services.AddHostedService<OptionGreekCalculationParameterFeeder>();

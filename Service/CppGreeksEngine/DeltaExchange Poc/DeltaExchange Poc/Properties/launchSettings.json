@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DeltaExchange Poc": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
