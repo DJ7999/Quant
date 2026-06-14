@@ -1,0 +1,6 @@
+{
+  "calculator": {
+    "server_address": "tcp://localhost:5555",
+    "timeout_ms": 60000
+  }
+}

@@ -10,5 +10,6 @@ namespace BhDream.Application.Abstractions.Repositories
     public interface IOptionHistoryRfrSyncRepository
     {
         Task UpdateStatus(List<OptionHistoryRfrSync> optionHistoryRfrSyncs, ProcessingStatus status);
+        Task UpdateSyncTableAsync();
     }
 }

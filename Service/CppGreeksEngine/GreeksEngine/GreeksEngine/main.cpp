@@ -1,9 +1,11 @@
 #include <iostream>
+#include <iostream>
 #include <csignal>
 #include <atomic>
 #include <thread>
 #include <vector>
 #include <Messaging/PipelineManager.h>
+#include <Messaging/ReqRepServer.h>
 #include <Apps/GreeksWorker.h>
 #include "Quant/IvCalculator.h"
 #include <iomanip>
@@ -23,16 +25,21 @@ int main() {
     std::signal(SIGINT, handleManualStop);
 
     Messaging::PipelineConfig pipeline;
-   
 
     try {
-        // Connect to your C# endpoints
-        pipeline.Initialize("tcp://127.0.0.1:5555", "tcp://127.0.0.1:5556");
+        // Initialize with push/pull addresses and a dedicated REQ/REP address
+        pipeline.Initialize("tcp://127.0.0.1:5555", "tcp://127.0.0.1:5556", "tcp://127.0.0.1:5557");
         std::cout << "[System] Pipeline initialized. Backpressure (HWM) active." << std::endl;
     }
     catch (const std::exception& e) {
         std::cerr << "Failed to init: " << e.what() << std::endl;
         return -1;
+    }
+
+    // Start Req/Rep server thread (handles single-request synchronous calls)
+    std::thread reqRepThread;
+    if (!pipeline.reqAddr.empty()) {
+        reqRepThread = std::thread(Messaging::ReqRepServer::Run, pipeline, std::ref(globalRunning));
     }
 
     // 2. Spawn Worker Pool
@@ -56,6 +63,8 @@ int main() {
     for (auto& t : pool) {
         if (t.joinable()) t.join();
     }
+
+    if (reqRepThread.joinable()) reqRepThread.join();
 
     std::cout << "[System] All workers stopped. Engine offline." << std::endl;
     return 0;

@@ -189,16 +189,24 @@ namespace BhDream.Application.Services
         }
 
         private async Task<OptionCsvImportResult> ProcessHistoriesAsync(
-            List<OptionHistory> rows,
-            Dictionary<string, Underlying> underlyingCache,
-            Dictionary<string, OptionContract> contractCache)
+    List<OptionHistory> rows,
+    Dictionary<string, Underlying> underlyingCache,
+    Dictionary<string, OptionContract> contractCache)
         {
             int inserted = 0, updated = 0;
             var seenHistoryByContractDate = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            int processed = 0;
 
+            // FIX 1: Move the list OUTSIDE the loop so it accumulates rows safely
+            var addList = new List<OptionHistory>();
+            int curCount = 0;
+            rows = rows.Where(r=> r.UnderlyingValue.HasValue && r.Close.HasValue).ToList();
             foreach (var row in rows)
             {
+                curCount++;
+                if(curCount%500 == 0)
+                {
+                    Console.WriteLine($"remaining {rows.Count-curCount}");
+                }
                 // resolve underlying/contract from cache
                 var symbol = row.Contract.Underlying.Symbol;
                 var underlying = underlyingCache[symbol];
@@ -216,32 +224,41 @@ namespace BhDream.Application.Services
                 if (!seenHistoryByContractDate.Add(historyKey))
                     continue; // duplicate history in same file
 
-                var addList = new List<OptionHistory>();
-                var existing = await _unitOfWork.OptionHistoryRepository.GetOptionHistoryAsync(row);
-                if (existing == null)
-                {
+                //var existing = await _unitOfWork.OptionHistoryRepository.GetOptionHistoryAsync(row);
+                //if (existing == null)
+                //{
                     addList.Add(row);
-                    
-                    inserted++;
-                }
-                else
-                {
-                    // ensure we update the tracked entity correctly: set Id and call UpdateAsync
-                    row.Id = existing.Id;
-                    await _unitOfWork.OptionHistoryRepository.UpdateAsync(row);
-                    updated++;
-                }
+                    //inserted++;
+                //}
+                ////else
+                //{
+                    //// ensure we update the tracked entity correctly: set Id and call UpdateAsync
+                    //row.Id = existing.Id;
+                    //await _unitOfWork.OptionHistoryRepository.UpdateAsync(row);
+                    //updated++;
+                //}
 
-                processed++;
-                if (processed % HistorySaveBatchSize == 0)
+                // FIX 2: Batch save based on the items actually waiting to be sent to the DB
+                if (addList.Count >= HistorySaveBatchSize)
                 {
-                    await _unitOfWork.OptionHistoryRepository.AddRangeAsync(addList);
+                    await _unitOfWork.OptionHistoryRepository.UpsertRangeAsync(addList);
                     await _unitOfWork.SaveChangesAsync();
-                    Console.WriteLine($"remaining = {rows.Count-processed}");
+
+                    Console.WriteLine($"Saved batch of {addList.Count} inserts. Total processed so far: {inserted + updated}");
+                    addList.Clear(); // Empty out the batch array for reuse
                 }
             }
 
-            // final save
+            // FINAL FIX: Save any remaining updates and inserts that didn't hit the 1000 threshold
+            if (addList.Count > 0)
+            {
+                await _unitOfWork.OptionHistoryRepository.UpsertRangeAsync(addList);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            Console.WriteLine($"Import complete! Total Inserted: {inserted}, Total Updated: {updated}");
+            //trigger update sync table
+            await _unitOfWork.OptionHistoryRfrSyncRepository.UpdateSyncTableAsync();
             await _unitOfWork.SaveChangesAsync();
 
             return new OptionCsvImportResult

@@ -24,7 +24,7 @@ namespace BhDream.Infrastructure.Persistence.Configurations
             builder.Property(x => x.Tenor).HasMaxLength(20).IsRequired();
             builder.Property(x => x.Date).IsRequired();
 
-            builder.HasIndex(r => new { r.Date, r.Market });
+            builder.HasIndex(r => new { r.Date, r.Market, r.Tenor });
         }
     }
 }

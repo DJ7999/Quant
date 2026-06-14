@@ -6,7 +6,7 @@ def start_pull_server():
     context = zmq.Context()
     # PULL = Consumes incoming tasks from the pipeline
     socket = context.socket(zmq.PULL)
-    socket.bind("tcp://*:5557")
+    socket.bind("tcp://*:5557c")
     
     print("🧠 ML-Lab ZeroMQ PULL Server is up and listening on port 5555...")
     print("Waiting for .NET pipeline submissions...\n")

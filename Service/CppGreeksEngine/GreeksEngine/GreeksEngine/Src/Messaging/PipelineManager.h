@@ -1,4 +1,4 @@
-#pragma once  // <--- Add this line at the very top!
+#pragma once
 #include <string>
 
 namespace Messaging {
@@ -6,10 +6,13 @@ namespace Messaging {
     public:
         std::string pullAddr;
         std::string pushAddr;
+        std::string reqAddr; // address for REQ/REP (this service will bind REP)
 
-        void Initialize(const std::string& pull, const std::string& push) {
+        // Keep existing two-arg initializer for backward compatibility.
+        void Initialize(const std::string& pull, const std::string& push, const std::string& req = "") {
             pullAddr = pull;
             pushAddr = push;
+            reqAddr = req;
         }
     };
 }

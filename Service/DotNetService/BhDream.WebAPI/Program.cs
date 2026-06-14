@@ -9,16 +9,19 @@ using BhDream.Infrastructure.Persistence;
 using BhDream.Infrastructure.Repositories;
 using BhDream.WebAPI;
 using Microsoft.EntityFrameworkCore;
+using EFCore.NamingConventions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddDbContext<QuantDbContext>(options =>
-    options.UseSqlite(
+{
+    options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly("BhDream.Infrastructure"))
-    );
+        b => b.MigrationsAssembly("BhDream.Infrastructure")
+    ); // <--- Chained right here to options;
+});
 builder.Services.AddScoped<IOptionHistoryRepository, OptionHistoryRepository>();
 builder.Services.AddScoped<IUnderlyingRepository, UnderlyingRepository>();
 builder.Services.AddScoped<IOptionContractRepository, OptionContractRepository>();

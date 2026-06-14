@@ -11,5 +11,6 @@ namespace BhDream.Application.Abstractions.Repositories
         Task UpdateRangeAsync(List<OptionHistory> entity);
         Task<OptionHistory?> GetOptionHistoryAsync(OptionHistory entity);
         Task<List<OptionHistory>> GetOptionHistoryForContractAsync(OptionContractDto entity);
+        Task UpsertRangeAsync(List<OptionHistory> entities);
     }
 }

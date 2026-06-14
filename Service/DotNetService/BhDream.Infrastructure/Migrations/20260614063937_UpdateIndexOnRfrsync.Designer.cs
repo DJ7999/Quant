@@ -5,39 +5,44 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace BhDream.Infrastructure.Migrations
 {
     [DbContext(typeof(QuantDbContext))]
-    [Migration("20260506041802_OptionGreeksAndIv")]
-    partial class OptionGreeksAndIv
+    [Migration("20260614063937_UpdateIndexOnRfrsync")]
+    partial class UpdateIndexOnRfrsync
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "10.0.7")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("BhDream.Domain.Entities.OptionContract", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("Expiry")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("OptionType")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("StrikePrice")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<Guid>("UnderlyingId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -50,42 +55,77 @@ namespace BhDream.Infrastructure.Migrations
             modelBuilder.Entity("BhDream.Domain.Entities.OptionGreeksAndIv", b =>
                 {
                     b.Property<Guid>("ContractId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("OptionHistoryId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("RfrMarket")
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("RfrTenor")
                         .HasMaxLength(20)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<double>("BenchMarkDelta")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("BenchMarkGamma")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("BenchMarkImpliedVolatility")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("BenchMarkRho")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("BenchMarkTheta")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("BenchMarkVega")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("BenchMarkVomma")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
 
                     b.Property<DateTime>("CalculatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<double>("Delta")
-                        .HasColumnType("REAL");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
 
                     b.Property<double>("Gamma")
-                        .HasColumnType("REAL");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
 
                     b.Property<double>("ImpliedVolatility")
-                        .HasColumnType("REAL");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
 
                     b.Property<double>("Rho")
-                        .HasColumnType("REAL");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
 
                     b.Property<double>("Theta")
-                        .HasColumnType("REAL");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
 
                     b.Property<double>("Vega")
-                        .HasColumnType("REAL");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
 
                     b.Property<double>("Vomma")
-                        .HasColumnType("REAL");
+                        .HasPrecision(18, 6)
+                        .HasColumnType("double precision");
 
                     b.HasKey("ContractId", "OptionHistoryId", "RfrMarket", "RfrTenor");
 
@@ -98,54 +138,54 @@ namespace BhDream.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<decimal?>("ChangeInUnderlyingValue")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric");
 
                     b.Property<decimal?>("Close")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<Guid>("ContractId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal?>("High")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<decimal?>("Low")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<decimal?>("Ltp")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric");
 
                     b.Property<long?>("NumberOfContracts")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bigint");
 
                     b.Property<decimal?>("Open")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<long?>("OpenInterest")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bigint");
 
                     b.Property<decimal?>("PremiumTurnover")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric");
 
                     b.Property<decimal?>("SettlePrice")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric");
 
                     b.Property<decimal?>("Turnover")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric");
 
                     b.Property<decimal?>("UnderlyingValue")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,2)");
 
                     b.HasKey("Id");
 
@@ -155,78 +195,119 @@ namespace BhDream.Infrastructure.Migrations
                     b.ToTable("OptionHistories");
                 });
 
+            modelBuilder.Entity("BhDream.Domain.Entities.OptionHistoryRfrSync", b =>
+                {
+                    b.Property<Guid>("OptionHistoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RfrMarket")
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("RfrTenor")
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ProcessingStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("StatusChangedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("OptionHistoryId", "RfrMarket", "RfrTenor");
+
+                    b.HasIndex("Date", "RfrTenor", "RfrMarket");
+
+                    b.ToTable("OptionHistoryRfrSync");
+                });
+
             modelBuilder.Entity("BhDream.Domain.Entities.OptionPricingParameterSnapshot", b =>
                 {
                     b.Property<decimal>("Close")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("Close");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("Date");
 
                     b.Property<DateTime>("Expiry")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("Expiry");
 
                     b.Property<Guid>("OptionContractId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid")
+                        .HasColumnName("optioncontractid");
 
                     b.Property<Guid>("OptionHistoryId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid")
+                        .HasColumnName("optionhistoryid");
 
-                    b.Property<string>("OptionType")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("OptionType")
+                        .HasColumnType("integer")
+                        .HasColumnName("OptionType");
 
                     b.Property<string>("RfrMarket")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text")
+                        .HasColumnName("rfrmarket");
 
                     b.Property<string>("RfrTenor")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text")
+                        .HasColumnName("rfrtenor");
 
                     b.Property<int>("RfrTenorDays")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("rfrtenordays");
 
                     b.Property<decimal>("RiskFreeRateValue")
                         .HasPrecision(18, 4)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,4)")
+                        .HasColumnName("riskfreeratevalue");
 
                     b.Property<decimal>("StrikePrice")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("StrikePrice");
 
                     b.Property<decimal>("UnderlyingValue")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("UnderlyingValue");
 
                     b.ToTable((string)null);
 
-                    b.ToView("View_OptionPricingParameterSnapshots", (string)null);
+                    b.ToView("view_optionpricingparametersnapshots", (string)null);
                 });
 
             modelBuilder.Entity("BhDream.Domain.Entities.RiskFreeRate", b =>
                 {
                     b.Property<DateTime>("Date")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Tenor")
                         .HasMaxLength(20)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Market")
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT")
+                        .HasColumnType("character varying(50)")
                         .HasDefaultValue("India");
 
                     b.Property<decimal>("Rate")
                         .HasPrecision(18, 4)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(18,4)");
 
                     b.HasKey("Date", "Tenor", "Market");
 
-                    b.HasIndex("Date", "Market");
+                    b.HasIndex("Date", "Market", "Tenor");
 
                     b.ToTable("RiskFreeRates", (string)null);
                 });
@@ -235,12 +316,12 @@ namespace BhDream.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Symbol")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
 
@@ -289,6 +370,25 @@ namespace BhDream.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Contract");
+                });
+
+            modelBuilder.Entity("BhDream.Domain.Entities.OptionHistoryRfrSync", b =>
+                {
+                    b.HasOne("BhDream.Domain.Entities.OptionHistory", "OptionHistory")
+                        .WithMany()
+                        .HasForeignKey("OptionHistoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BhDream.Domain.Entities.RiskFreeRate", "RiskFreeRate")
+                        .WithMany()
+                        .HasForeignKey("Date", "RfrTenor", "RfrMarket")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OptionHistory");
+
+                    b.Navigation("RiskFreeRate");
                 });
 
             modelBuilder.Entity("BhDream.Domain.Entities.OptionContract", b =>

@@ -4,6 +4,7 @@ using BhDream.Domain.Entities;
 using BhDream.Domain.Enums;
 using BhDream.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using EFCore.BulkExtensions;
 
 namespace BhDream.Infrastructure.Repositories
 {
@@ -80,6 +81,40 @@ namespace BhDream.Infrastructure.Repositories
                 return;
 
             await _context.OptionHistories.AddRangeAsync(entities);
+        }
+
+        // Define this at the class level
+        private static readonly SemaphoreSlim _dbLock = new SemaphoreSlim(1, 1);
+
+        public async Task UpsertRangeAsync(List<OptionHistory> entities)
+        {
+            if (entities == null || !entities.Any()) return;
+
+            // Wait to enter the database-critical section
+            await _dbLock.WaitAsync();
+            try
+            {
+                var bulkConfig = new BulkConfig
+                {
+                    // These properties identify which records to update
+                    UpdateByProperties = new List<string> { nameof(OptionHistory.ContractId), nameof(OptionHistory.Date) },
+
+                    // Explicitly exclude the Primary Key from the update set 
+                    // to prevent triggering the Foreign Key violation (23503)
+                    PropertiesToExcludeOnUpdate = new List<string> { nameof(OptionHistory.Id) },
+
+                    // Performance optimizations
+                    SetOutputIdentity = false,
+                    BatchSize = 1000
+                };
+
+                await _context.BulkInsertOrUpdateAsync(entities, bulkConfig);
+            }
+            finally
+            {
+                // Always release the lock, even if the DB operation fails
+                _dbLock.Release();
+            }
         }
 
         public Task UpdateRangeAsync(List<OptionHistory> entity)
