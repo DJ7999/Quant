@@ -1,6 +1,16 @@
 import zmq
 import json
 import time
+import logging
+from MlWorker import MlWorker
+
+def setup_logging():
+    """Configures global logging layout and levels."""
+    logging.basicConfig(
+        level=logging.INFO,  # Change to logging.DEBUG to see finer logs
+        format="%(asctime)s [%(levelname)s] (%(name)s) %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
 
 def start_pull_server():
     context = zmq.Context()
@@ -32,5 +42,29 @@ def start_pull_server():
         except json.JSONDecodeError:
             print(f"⚠️ Received plain-text frame payload (Unstructured JSON): {raw_message}\n")
 
+def main():
+    setup_logging();
+    main_logger = logging.getLogger("main_app")
+    main_logger.info("Initializing application components...")
+
+    # 2. Instantiate and start the worker
+    worker = MlWorker(check_interval=5)
+    worker.start()
+
+    main_logger.info("Ready for other extension tasks!")
+
+    try:
+        # Simulating your main app running endlessly
+        while True:
+            main_logger.info("Doing other application operations seamlessly...")
+            time.sleep(10)
+
+    except KeyboardInterrupt:
+        main_logger.warning("Shutdown signal received.")
+        worker.stop()
+        main_logger.info("Clean shutdown complete.")
+
+
 if __name__ == "__main__":
-    start_pull_server()
+    main()
+

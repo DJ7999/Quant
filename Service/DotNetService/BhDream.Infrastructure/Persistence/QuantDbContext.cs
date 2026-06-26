@@ -14,6 +14,12 @@ namespace BhDream.Infrastructure.Persistence
         public DbSet<OptionPricingParameterSnapshot> OptionPricingParameterSnapshots => Set<OptionPricingParameterSnapshot>();
         public DbSet<OptionGreeksAndIv> OptionGreeksAndIvs => Set<OptionGreeksAndIv>();
         public DbSet<OptionHistoryRfrSync> OptionHistoryRfrSync => Set<OptionHistoryRfrSync>();
+        public DbSet<MlModel> MlModels => Set<MlModel>();
+
+        // Inside QuantDbContext.cs
+        public static TimeZoneInfo IstZone { get; } = OperatingSystem.IsWindows()
+            ? TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")
+            : TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

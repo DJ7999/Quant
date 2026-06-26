@@ -3,6 +3,7 @@ using System;
 using BhDream.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BhDream.Infrastructure.Migrations
 {
     [DbContext(typeof(QuantDbContext))]
-    partial class QuantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260617040325_CreateViewoptionHistoryClosesetRfr")]
+    partial class CreateViewoptionHistoryClosesetRfr
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,52 +24,6 @@ namespace BhDream.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("BhDream.Domain.Entities.MlModel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("EndDateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("FailureReason")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Features")
-                        .HasColumnType("jsonb");
-
-                    b.Property<DateTime>("LastUpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ModelMetrics")
-                        .HasColumnType("jsonb");
-
-                    b.Property<string>("ModelName")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
-
-                    b.Property<string>("ModelReference")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Parameters")
-                        .HasColumnType("jsonb");
-
-                    b.Property<DateTime>("StartDateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ModelName", "Status", "StartDateTime", "EndDateTime");
-
-                    b.ToTable("ml_models", (string)null);
-                });
 
             modelBuilder.Entity("BhDream.Domain.Entities.OptionContract", b =>
                 {

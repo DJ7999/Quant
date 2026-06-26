@@ -86,13 +86,13 @@ namespace BhDream.Application.ML.Features
         /// <summary>
         /// Instantiates and strongly types an incoming dynamic workspace payload by reading from our cached internal mappings.
         /// </summary>
-        public List<IModelFeature> MapPayloadToFeatures(TrainModelRequestDto requestDto)
+        public MappedFeaturePayload MapPayloadToFeatures(TrainModelRequestDto requestDto)
         {
-            var instantiatedPipeline = new List<IModelFeature>();
+            var mappedFeaturePayload = new MappedFeaturePayload();
 
             if (requestDto?.FeaturesPipeline == null || !requestDto.FeaturesPipeline.Any())
             {
-                return instantiatedPipeline;
+                return mappedFeaturePayload;
             }
 
             foreach (var instance in requestDto.FeaturesPipeline)
@@ -111,10 +111,10 @@ namespace BhDream.Application.ML.Features
                 // Polymorphically inflate to the explicit destination class type mapping context
                 var instantiatedFeature = (IModelFeature)JsonSerializer.Deserialize(rawJsonText, targetType, _jsonOptions)!;
 
-                instantiatedPipeline.Add(instantiatedFeature);
+                mappedFeaturePayload.AddFeature(instantiatedFeature);
             }
 
-            return instantiatedPipeline;
+            return mappedFeaturePayload;
         }
         
 

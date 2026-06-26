@@ -68,36 +68,35 @@ namespace BhDream.Infrastructure.Repositories
                 int rowsAffected;
                 int batchSize = 50000;
 
-                // Use a subquery to apply the LIMIT, then insert
+                // Clean query processing directly from our specialized unquoted view
                 string sql = $@"
-            INSERT INTO ""OptionHistoryRfrSync"" (
-                ""OptionHistoryId"", ""Date"", ""RfrTenor"", ""RfrMarket"", 
-                ""ProcessingStatus"", ""UpdatedAt"", ""StatusChangedAt""
-            )
-            SELECT * FROM (
-                SELECT 
-                    oh.""Id"", oh.""Date"", rfr.""Tenor"", rfr.""Market"", 
-                    0, NOW(), NOW()
-                FROM ""OptionHistories"" oh
-                INNER JOIN ""RiskFreeRates"" rfr ON oh.""Date""::date = rfr.""Date""::date
-                LEFT JOIN ""OptionHistoryRfrSync"" sync ON 
-                    oh.""Id"" = sync.""OptionHistoryId"" AND 
-                    rfr.""Market"" = sync.""RfrMarket"" AND 
-                    rfr.""Tenor"" = sync.""RfrTenor""
-                WHERE sync.""OptionHistoryId"" IS NULL
-                LIMIT {batchSize}
-            ) AS batch
-            ON CONFLICT (""OptionHistoryId"", ""RfrTenor"", ""RfrMarket"") 
-            DO NOTHING;";
+    INSERT INTO ""OptionHistoryRfrSync"" (
+        ""OptionHistoryId"", ""Date"", ""RfrTenor"", ""RfrMarket"", 
+        ""ProcessingStatus"", ""UpdatedAt"", ""StatusChangedAt""
+    )
+    SELECT 
+        v.""OptionHistoryId"", v.""Date"", v.""RfrTenor"", v.""RfrMarket"", 
+        0, NOW(), NOW()
+    FROM v_OptionHistoryClosestRfr v
+    WHERE NOT EXISTS (
+        SELECT 1 
+        FROM ""OptionHistoryRfrSync"" sync 
+        WHERE v.""OptionHistoryId"" = sync.""OptionHistoryId"" 
+          AND v.""RfrMarket"" = sync.""RfrMarket"" 
+          AND v.""RfrTenor"" = sync.""RfrTenor""
+    )
+    ORDER BY v.""OptionHistoryId"", v.""RfrMarket""
+    LIMIT {batchSize}
+    ON CONFLICT (""OptionHistoryId"", ""RfrTenor"", ""RfrMarket"") 
+    DO NOTHING;";
 
                 do
                 {
                     rowsAffected = await _dbContext.Database.ExecuteSqlRawAsync(sql);
 
-                    // Log progress for monitoring
                     if (rowsAffected > 0)
                     {
-                        Console.WriteLine($"Inserted a batch of {rowsAffected} records.");
+                        Console.WriteLine($"[Sync] Processed and paired a batch of {rowsAffected} closest-tenor records.");
                     }
 
                 } while (rowsAffected > 0);

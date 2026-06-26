@@ -7,9 +7,9 @@ class MLTrainer:
     def __init__(self, model_strategy:MLModelStrategy):
         self.model_strategy = model_strategy
         
-    def train_model(self,features:pd.DataFrame ,params:dict[str,Any]):  
-        model_strategy = self.model_strategy()
-        model_strategy.train(features, params)
+    def train_model(self,features:pd.DataFrame ,params:dict[str,Any])->dict[str,Any]:  
         
-        model_strategy.save_model()
+        return self.model_strategy.train(features, params)
+        
+        ##model_strategy.save_model()
         

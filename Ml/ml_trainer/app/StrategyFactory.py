@@ -8,7 +8,7 @@ from StrategyType import StrategyType
 class StrategyFactory:
     """Factory to create ML model strategy instances"""
     _strategies: dict[str, Type[MLModelStrategy]] = {
-        StrategyType.KMEANS.value: KMeansModelStrategy,
+        StrategyType.KMeansClustering.value: KMeansModelStrategy,
     }
     
     @classmethod
@@ -21,7 +21,8 @@ class StrategyFactory:
         
         if not strategy:
             raise ValueError(f"Unknown strategy: {strategy_type}")
-        return MLTrainer(strategy)
+        
+        return MLTrainer(strategy())
     
     @classmethod
     def register_strategy(cls, name: str, strategy_class: Type[MLModelStrategy]):

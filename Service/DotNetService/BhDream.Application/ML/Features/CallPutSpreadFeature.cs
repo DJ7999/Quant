@@ -11,7 +11,9 @@ namespace BhDream.Application.ML.Features
     {
         public string FeatureName => "Call-Put Spread";
 
-        [FeatureAttributes("Metric",InputType = UiInputType.Select, SelectOptions = new[] {"Implied Volatility", "Trading Volume"})]
+        [FeatureAttributes("Metric",InputType = UiInputType.Select,
+            SelectOptions = new[] { "Implied Volatility" })]
+            //SelectOptions = new[] {"Implied Volatility", "Trading Volume"})]
         public required string Metric { get; set; }
 
         [FeatureAttributes("Slicing Method", 

@@ -14,5 +14,6 @@ namespace BhDream.Application.Abstractions.Repositories
         public IOptionPricingParameterSnapshotRepository OptionPricingParameterSnapshotRepository { get; set; }
         public IOptionHistoryRfrSyncRepository OptionHistoryRfrSyncRepository { get; set; }
         public IOptionGreeksAndIvRepository OptionGreeksAndIvRepository { get; set; }
+        public IMlModelRepository MlModelRepository { get; set; }
     }
 }

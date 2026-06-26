@@ -1,6 +1,7 @@
 ﻿using BhDream.Application.Dtos;
 using BhDream.Application.ML.DTO;
 using BhDream.Application.ML.Features;
+using BhDream.Application.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BhDream.WebAPI.Controller
@@ -10,11 +11,11 @@ namespace BhDream.WebAPI.Controller
     public class MlManagerController : ControllerBase
     {
         private readonly ILogger<MlManagerController> _logger;
-        private readonly IFeatureRegistry _featureRegistry;
-        public MlManagerController(ILogger<MlManagerController> logger, IFeatureRegistry featureRegistry)
+        private readonly ITrainMlModelService _mlTrainingservice;
+        public MlManagerController(ILogger<MlManagerController> logger, ITrainMlModelService mlTrainingService)
         {
             _logger = logger;
-            _featureRegistry = featureRegistry;
+            _mlTrainingservice = mlTrainingService;
         }
 
         [HttpGet("get-model")]
@@ -26,12 +27,17 @@ namespace BhDream.WebAPI.Controller
         }
 
         [HttpGet("get-features")]
-        public IActionResult GetFeatures([FromQuery] string modelName)
+        public async Task<IActionResult> GetFeaturesAsync([FromQuery] string modelName)
         {
             try
             {
-                var featureOptions =  _featureRegistry.GetFeaturesForModel(modelName);
-                return Ok(featureOptions);
+                var featureOptions = await _mlTrainingservice.GetFeaturesForModel(modelName);
+                var featureParameters = await _mlTrainingservice.GetParametersForModel(modelName);
+                return Ok(new
+                {
+                    Features = featureOptions,
+                    Parameters = featureParameters
+                });
             }
             catch (Exception ex)
             {
@@ -41,11 +47,11 @@ namespace BhDream.WebAPI.Controller
         }
 
         [HttpPost("train-model")]
-        public IActionResult GetFeatures([FromBody] TrainModelRequestDto modelName)
+        public async Task<IActionResult> TrainModelAsync([FromBody] TrainModelRequestDto modelName)
         {
             try
             {
-                var featureOptions = _featureRegistry.MapPayloadToFeatures(modelName);
+                await _mlTrainingservice.TrainModel(modelName);
                 return Ok();
             }
             catch (Exception ex)

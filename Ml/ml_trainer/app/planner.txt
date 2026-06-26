@@ -1,0 +1,11 @@
+what python needs 
+Rolling ->  log return -> window
+Rolling ->  sigma -> window
+Rolling ->  Iv ->   Combined -> Atm
+                             -> all
+                    Call     -> Atm
+                             -> all
+                    Put      -> Atm
+                             -> all
+CallPutSpread -> Iv -> Atm
+                    -> all

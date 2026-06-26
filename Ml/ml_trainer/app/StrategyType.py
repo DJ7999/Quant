@@ -1,2 +1,3 @@
+from enum import Enum
 class StrategyType(Enum):
-    KMEANS = "kmeans"
+    KMeansClustering = "KMeansClustering"
