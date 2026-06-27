@@ -1,0 +1,1 @@
+![System Architecture](Info/HLD%20Architectuure.drawio.svg)
