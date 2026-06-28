@@ -131,6 +131,9 @@
     <ClCompile Include="Generated\pricing.pb.cc" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Src\Apps\GreeksWorker.cpp" />
+    <ClCompile Include="Src\Messaging\ReqRepServer.cpp" />
+    <ClCompile Include="Src\Messaging\Ventilator.cpp" />
+    <ClCompile Include="Src\Quant\GreeksUtils.cpp" />
     <ClCompile Include="Src\Quant\LbrBenchmarkIvCalculator.cpp" />
     <ClCompile Include="Src\Quant\QlibBenchmarkBsCalculator.cpp" />
     <ClCompile Include="Src\Quant\BsCalculator.cpp" />
@@ -140,6 +143,10 @@
     <ClInclude Include="Generated\pricing.pb.h" />
     <ClInclude Include="Src\Apps\GreeksWorker.h" />
     <ClInclude Include="Src\Messaging\PipelineManager.h" />
+    <ClInclude Include="Src\Messaging\ReqRepServer.h" />
+    <ClInclude Include="Src\Messaging\SocketOptions.h" />
+    <ClInclude Include="Src\Messaging\Ventilator.h" />
+    <ClInclude Include="Src\Quant\GreeksUtils.h" />
     <ClInclude Include="Src\Quant\LbrBenchmarkIvCalculator.h" />
     <ClInclude Include="Src\Quant\QlibBenchmarkBsCalculator.h" />
     <ClInclude Include="Src\Quant\BsCalculator.h" />

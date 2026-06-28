@@ -13,21 +13,24 @@ namespace BhDream.Application.ML.Features
 
         [FeatureAttributes("Target Metric", 
             InputType = UiInputType.Select,
-            SelectOptions = new[] { "Log Return", "Sigma", "Implied Volatility", "Underlying Volume", "Option Contract Volume"})]
+            SelectOptions = new[] { "Log Return", "Sigma", "Implied Volatility" })]
+            //SelectOptions = new[] { "Log Return", "Sigma", "Implied Volatility", "Underlying Volume", "Option Contract Volume"})]
         public required string TargetMetric { get; set; }
 
         [FeatureAttributes("Option Type", 
             InputType = UiInputType.Select, 
             SelectOptions = new[] {"Call","Put","Combined"},
             VisibleIfProperty = nameof(TargetMetric),
-            VisibleIfValues = new[] { "Implied Volatility", "Option Contract Volume" })]
+            VisibleIfValues = new[] { "Implied Volatility", 
+                //"Option Contract Volume" 
+            })]
         public string? OptionType { get; set; }
 
         [FeatureAttributes("Slicing Method", 
             InputType = UiInputType.Select, 
             SelectOptions = new[] {"ATM Option", "All Active Options Average"},
             VisibleIfProperty = nameof(OptionType),
-            VisibleIfValues = new[] { "Implied Volatility", "Option Contract Volume" })]
+            VisibleIfValues = new[] { "Call", "Put", "Combined" })]
         public string? SlicingMethod { get; set; }
 
     }

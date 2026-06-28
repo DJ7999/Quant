@@ -18,6 +18,8 @@ namespace BhDream.Infrastructure.Repositories
         public IOptionPricingParameterSnapshotRepository OptionPricingParameterSnapshotRepository { get; set; }
         public IOptionHistoryRfrSyncRepository OptionHistoryRfrSyncRepository { get; set; }
         public IOptionGreeksAndIvRepository OptionGreeksAndIvRepository { get; set; }
+        
+        public IMlModelRepository MlModelRepository { get; set; }
 
         public UnitOfWork(
             QuantDbContext context,
@@ -27,7 +29,8 @@ namespace BhDream.Infrastructure.Repositories
             IRiskFreeRateRepository riskFreeRateRepository,
             IOptionPricingParameterSnapshotRepository optionPricingParameterSnapshotRepository,
             IOptionHistoryRfrSyncRepository optionHistoryRfrSyncRepository,
-            IOptionGreeksAndIvRepository optionGreeksAndIvRepository)
+            IOptionGreeksAndIvRepository optionGreeksAndIvRepository,
+            IMlModelRepository mlModelRepository)
         {
             _context = context;
             OptionHistoryRepository = optionHistoryRepository;
@@ -37,6 +40,7 @@ namespace BhDream.Infrastructure.Repositories
             OptionPricingParameterSnapshotRepository = optionPricingParameterSnapshotRepository;
             OptionHistoryRfrSyncRepository = optionHistoryRfrSyncRepository;
             OptionGreeksAndIvRepository = optionGreeksAndIvRepository;
+            MlModelRepository = mlModelRepository;
         }
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

@@ -8,6 +8,6 @@ namespace BhDream.Application.ML.Features
     public interface IFeatureRegistry
     {
         List<FeatureMetadataDto> GetFeaturesForModel(string modelName);
-        List<IModelFeature> MapPayloadToFeatures(TrainModelRequestDto requestDto);
+        MappedFeaturePayload MapPayloadToFeatures(TrainModelRequestDto requestDto);
     }
 }

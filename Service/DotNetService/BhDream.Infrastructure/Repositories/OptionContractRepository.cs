@@ -71,8 +71,18 @@ namespace BhDream.Infrastructure.Repositories
             if (contract.ExpirationDate.HasValue)
             {
                 // Use the Date property directly if supported, or stick to your range check
-                var date = contract.ExpirationDate.Value.Date;
-                query = query.Where(oc => oc.Expiry >= date && oc.Expiry < date.AddDays(1));
+                // 1. Get the local IST date at midnight
+                var localDate = contract.ExpirationDate.Value.Date;
+
+                // 2. Define your IST boundaries for that entire day
+                var istStart = DateTime.SpecifyKind(localDate, DateTimeKind.Unspecified);
+                var istEnd = istStart.AddDays(1);
+
+                // 3. Find your IST zone info (you might want to expose this as a static helper from your DbContext)
+                var utcStart = TimeZoneInfo.ConvertTimeToUtc(istStart, QuantDbContext.IstZone);
+                var utcEnd = TimeZoneInfo.ConvertTimeToUtc(istEnd, QuantDbContext.IstZone);
+                // 5. Query using the UTC boundaries
+                query = query.Where(oc => oc.Expiry >= utcStart && oc.Expiry < utcEnd);
             }
 
             return await query.ToListAsync();

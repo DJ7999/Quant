@@ -9,16 +9,24 @@ using BhDream.Infrastructure.Persistence;
 using BhDream.Infrastructure.Repositories;
 using BhDream.WebAPI;
 using Microsoft.EntityFrameworkCore;
+using EFCore.NamingConventions;
+using BhDream.Application.ML.Parameters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddDbContext<QuantDbContext>(options =>
-    options.UseSqlite(
+{
+    options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly("BhDream.Infrastructure"))
+        npgsqlOptions =>
+        {
+            npgsqlOptions.MigrationsAssembly("BhDream.Infrastructure");
+            npgsqlOptions.CommandTimeout(180); // 3 minutes
+        }
     );
+});
 builder.Services.AddScoped<IOptionHistoryRepository, OptionHistoryRepository>();
 builder.Services.AddScoped<IUnderlyingRepository, UnderlyingRepository>();
 builder.Services.AddScoped<IOptionContractRepository, OptionContractRepository>();
@@ -26,6 +34,7 @@ builder.Services.AddScoped<IRiskFreeRateRepository, RiskFreeRateRepository>();
 builder.Services.AddScoped<IOptionPricingParameterSnapshotRepository, OptionPricingParameterSnapshotRepository>();
 builder.Services.AddScoped<IOptionHistoryRfrSyncRepository, OptionHistoryRfrSyncRepository>();
 builder.Services.AddScoped<IOptionGreeksAndIvRepository, OptionGreeksAndIvRepository>();
+builder.Services.AddScoped<IMlModelRepository, MlModelRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IOptionCsvImportService, OptionCsvImportService>();
@@ -34,7 +43,9 @@ builder.Services.AddScoped<IOptionHistoryCsvParser, OptionHistoryCsvParser>();
 builder.Services.AddScoped<IRfrCsvParser, RfrCsvParser>();
 builder.Services.AddScoped<IOptionsAnalyticsService, OptionsAnalyticsService>();
 builder.Services.AddScoped<IOptionProcessingService, OptionProcessingService>();
+builder.Services.AddScoped<ITrainMlModelService, TrainMlModelService>();
 
+builder.Services.AddTransient<IMlParameters, KMeansParameters>();
 builder.Services.AddSingleton<IFeatureRegistry, FeatureRegistry>();
 builder.Services.AddSingleton<IOptionPricingDispatcher, ZmqOptionPricingDispatcher>();
 builder.Services.AddSingleton<IOptionGreeksResultReceiver, ZmqOptionGreeksResultReceiver>();

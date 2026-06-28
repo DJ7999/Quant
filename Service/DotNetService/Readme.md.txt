@@ -1,0 +1,1 @@
+docker run -d --name bh_dream_postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=YourSecurePassword123! -e POSTGRES_DB=quant_db -p 5432:5432 -v pg_quant_local_data:/var/lib/postgresql/data --restart unless-stopped postgres:16-alpine

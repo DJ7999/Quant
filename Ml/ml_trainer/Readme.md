@@ -1,0 +1,1 @@
+sqlacodegen postgresql+psycopg://postgres:YourSecurePassword123!@localhost:5433/quant_db --generator declarative      

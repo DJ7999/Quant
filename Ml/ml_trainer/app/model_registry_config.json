@@ -1,0 +1,14 @@
+{
+  "feature_map": {    
+    "close_price": "1",
+    "volatility": "2",
+    "asset_id": "3",
+    "volume": "4"
+  },
+  "param_map": {
+    "k" : "1", 
+    "max_itr":"2", 
+    "random_state":"3"
+    
+  }
+}
