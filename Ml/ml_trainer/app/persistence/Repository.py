@@ -1,7 +1,8 @@
 import datetime
-from persistence import get_db_session
-from sqlalchemy import text
 from typing import Any, Dict, List, Optional
+from sqlalchemy import text
+from persistence import get_db_session
+from Dto.MarketSnapshotMatrixDto import EagerLoadedPriceMatrix, MarketSnapshotItem
 
 class Repository:
     def __init__(self):
@@ -11,7 +12,6 @@ class Repository:
         """
         Fetches distinct dates and underlying values within a given date range.
         """
-        # 1. Use double quotes exactly like your raw psql query to respect case sensitivity
         query = text("""
             SELECT DISTINCT "Date", "UnderlyingValue" 
             FROM "OptionHistories" 
@@ -20,15 +20,11 @@ class Repository:
             ORDER BY "Date" ASC
         """)
         
-        # 2. Use the safe context manager to acquire a session
         with get_db_session() as session:
-            # Execute and pass parameters securely to avoid SQL injection
             result = session.execute(query, {
                 "start": start_date,
                 "end": end_date
             })
-            
-            # 3. .mappings() converts rows into accessible dictionaries
             return [dict(row) for row in result.mappings()]
         
     def get_iv(self, start_date: datetime.datetime, end_date: datetime.datetime, option_type: Optional[int] = None) -> List[Dict[str, Any]]:
@@ -54,9 +50,9 @@ class Repository:
                             ABS(
                                 (EXTRACT(EPOCH FROM oc."Expiry") - EXTRACT(EPOCH FROM oh."Date")) / 86400.0 - 
                                 (CASE 
-                                    WHEN rfr."Tenor" LIKE '%%Day%%' THEN CAST(substring(rfr."Tenor" from '^[0-9]+') AS NUMERIC)
-                                    WHEN rfr."Tenor" LIKE '%%Month%%' THEN CAST(substring(rfr."Tenor" from '^[0-9]+') AS NUMERIC) * 30.0
-                                    WHEN rfr."Tenor" LIKE '%%Year%%' THEN CAST(substring(rfr."Tenor" from '^[0-9]+') AS NUMERIC) * 365.0
+                                    WHEN rfr."Tenor" LIKE '%Day%' THEN CAST(substring(rfr."Tenor" from '^[0-9]+') AS NUMERIC)
+                                    WHEN rfr."Tenor" LIKE '%Month%' THEN CAST(substring(rfr."Tenor" from '^[0-9]+') AS NUMERIC) * 30.0
+                                    WHEN rfr."Tenor" LIKE '%Year%' THEN CAST(substring(rfr."Tenor" from '^[0-9]+') AS NUMERIC) * 365.0
                                     ELSE 0.0
                                  END)
                             ) ASC
@@ -69,7 +65,6 @@ class Repository:
                   AND oh."UnderlyingValue" IS NOT NULL
                   AND oh."Date" >= :start 
                   AND oh."Date" <= :end
-                  -- 💡 Parameterized OptionType filtering logic:
                   AND (:option_type IS NULL OR oc."OptionType" = :option_type)
             )
             SELECT 
@@ -82,7 +77,51 @@ class Repository:
             result = session.execute(query, {
                 "start": start_date,
                 "end": end_date,
-                "option_type": option_type  # Passes None, 0, or 1 cleanly
+                "option_type": option_type
             })
-            
             return [dict(row) for row in result.mappings()]
+
+    def get_option_histories(
+        self,
+        start_date: datetime.datetime,
+        end_date: datetime.datetime,
+    ) -> EagerLoadedPriceMatrix:
+        """
+        Fetches option histories and organizes them into a nested dictionary
+        structure for fast access during simulation.
+        """
+        query = text("""
+            SELECT
+                oh."Date",
+                oh."ContractId",
+                oh."Close" AS "Close",
+                oh."UnderlyingValue" AS "UnderlyingValue",
+                oc."Expiry" AS "Expiry",
+                oc."StrikePrice" AS "StrikePrice",
+                oc."OptionType" AS "OptionType"
+            FROM "OptionHistories" oh
+            JOIN "OptionContracts" oc ON oh."ContractId" = oc."Id"
+            WHERE oh."Date" >= :start
+              AND oh."Date" <= :end
+              AND oh."Close" IS NOT NULL
+              AND oh."UnderlyingValue" IS NOT NULL
+            ORDER BY oh."Date" ASC;
+        """)
+
+        with get_db_session() as session:
+            result = session.execute(query, {"start": start_date, "end": end_date})
+
+            price_matrix: EagerLoadedPriceMatrix = {}
+            for row in result.mappings():
+                date_key = row["Date"]
+                contract_id = row["ContractId"]
+
+                price_matrix.setdefault(date_key, {})[contract_id] = MarketSnapshotItem(
+                    currentPrice=float(row["Close"]),
+                    expiry=row["Expiry"],
+                    strike=float(row["StrikePrice"]),
+                    isCall=row["OptionType"] == 0,
+                    underlyingPrice=float(row["UnderlyingValue"]),
+                )
+
+            return price_matrix
