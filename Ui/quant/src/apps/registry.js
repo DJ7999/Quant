@@ -1,7 +1,8 @@
 import OptionHistoryManager from "./OptionHistoryManager";
 import MoneyMarketHistoryManager from "./MoneyMarketHistorymanager";
 import OptionBasketVisualizer from "./OptionBasketVisualizer";
-import MlModelManager from "./MlModelManager"; // Imported
+import MlModelManager from "./MlModelManager";
+import HypothesisTesting from "./HypothesisTesting";
 
 export const QUANT_APPS = [
   {
@@ -26,10 +27,17 @@ export const QUANT_APPS = [
     component: OptionBasketVisualizer,
   },
   {
-    id: "ml-model-manager", // New Entry
+    id: "ml-model-manager",
     title: "ML Model Manager",
     icon: "🤖",
-    category: "ANALYTICS", // Or "DATA ADMINISTRATION" depending on your preference
+    category: "ANALYTICS",
     component: MlModelManager,
+  },
+  {
+    id: "hypothesis-testing",
+    title: "Hypothesis Testing",
+    icon: "🧪",
+    category: "ANALYTICS",
+    component: HypothesisTesting,
   }
 ];

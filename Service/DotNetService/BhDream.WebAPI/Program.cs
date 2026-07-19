@@ -44,6 +44,11 @@ builder.Services.AddScoped<IRfrCsvParser, RfrCsvParser>();
 builder.Services.AddScoped<IOptionsAnalyticsService, OptionsAnalyticsService>();
 builder.Services.AddScoped<IOptionProcessingService, OptionProcessingService>();
 builder.Services.AddScoped<ITrainMlModelService, TrainMlModelService>();
+builder.Services.AddScoped<IHypothesisTestingService, HypothesisTestingService>();
+builder.Services.AddHttpClient(string.Empty, client => 
+{
+    client.Timeout = TimeSpan.FromMinutes(10); // 10 minutes timeout for heavy backtesting computations
+});
 
 builder.Services.AddTransient<IMlParameters, KMeansParameters>();
 builder.Services.AddSingleton<IFeatureRegistry, FeatureRegistry>();

@@ -1,4 +1,4 @@
-﻿using BhDream.Domain.Entities;
+using BhDream.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,5 +10,6 @@ namespace BhDream.Application.Abstractions.Repositories
         public Task<MlModel?> GetById(Guid id);
         public Task<MlModel?> GetByFeaturesAndWindow(string modelName, DateTime startDateTime, DateTime endDateTime, string features, string parameters);
         public Task StartTrainingModel(MlModel model);
+        public Task<List<MlModel>> GetFilteredModels(MlModel model);
     }
 }

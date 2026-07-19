@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import date
 from typing import Dict, List
 
@@ -34,3 +34,4 @@ class VariantEvaluationResultDto(BaseModel):
     
     # Key: 0, 1, 2 (Integers matching your metadata mapping)
     RegimeProfiles: Dict[int, RegimeProfileDto]
+    RegimeAggregates: Dict[int, PureMetricsDto] = Field(default_factory=dict)

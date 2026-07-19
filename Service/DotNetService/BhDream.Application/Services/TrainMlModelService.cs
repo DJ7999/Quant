@@ -1,4 +1,4 @@
-﻿using BhDream.Application.Abstractions.Repositories;
+using BhDream.Application.Abstractions.Repositories;
 using BhDream.Application.ML.DTO;
 using BhDream.Application.ML.Features;
 using BhDream.Application.ML.Parameters;
@@ -92,6 +92,72 @@ namespace BhDream.Application.Services
                 modelEndDate = modelStartDate.AddMonths(modelRequest.ModelTrainingWindowInMonths).AddDays(-1);
                 _logger.LogInformation($"Model Start : {modelStartDate} , Model End : {modelEndDate} Updated");
             }
+        }
+
+        public async Task<List<MlModel>> GetFilteredModelsAsync(MlModelFilterRequestDto filterRequest)
+        {
+            // 1. Map features to search string from FeaturesPipeline (supporting pipe-separated sub-parameters)
+            string? featureString = null;
+            if (filterRequest.FeaturesPipeline != null && filterRequest.FeaturesPipeline.Count > 0)
+            {
+                var firstFeature = filterRequest.FeaturesPipeline[0];
+                var featureName = firstFeature.FeatureCode == "CallPutSpreadFeature" ? "Call-Put Spread" :
+                                  firstFeature.FeatureCode == "MovingAverageFeature" ? "Moving Average" :
+                                  firstFeature.FeatureCode;
+
+                var featureTerms = new List<string> { featureName };
+
+                var keyMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { "rollingwindowsize", "RollingWindowSize" },
+                    { "targetmetric", "TargetMetric" },
+                    { "optiontype", "OptionType" },
+                    { "slicingmethod", "SlicingMethod" },
+                    { "metric", "Metric" }
+                };
+
+                if (firstFeature.Parameters != null)
+                {
+                    foreach (var param in firstFeature.Parameters)
+                    {
+                        if (param.Value != null)
+                        {
+                            var rawVal = param.Value.ToString();
+                            if (!string.IsNullOrEmpty(rawVal))
+                            {
+                                var dbKey = keyMapping.TryGetValue(param.Key, out var mappedKey) ? mappedKey : param.Key;
+                                featureTerms.Add($"{dbKey}:{rawVal}");
+                            }
+                        }
+                    }
+                }
+
+                featureString = string.Join("|", featureTerms);
+            }
+
+            // 2. Map the first active parameter filter into key:val format
+            string? parametersString = null;
+            if (filterRequest.Parameters != null && filterRequest.Parameters.Count > 0)
+            {
+                foreach (var param in filterRequest.Parameters)
+                {
+                    parametersString = $"{param.Key}:{param.Value}";
+                    break; // Just get the first key-value pair
+                }
+            }
+
+            // 3. Create the MlModel filter object
+            var filter = new MlModel
+            {
+                ModelName = filterRequest.ModelName ?? string.Empty,
+                StartDateTime = filterRequest.StartDateTime ?? default,
+                EndDateTime = filterRequest.EndDateTime ?? default,
+                Features = featureString,
+                Parameters = parametersString,
+                Status = filterRequest.Status ?? BhDream.Domain.Enums.MlTrainingStatus.Trained
+            };
+
+            return await _unitOfWork.MlModelRepository.GetFilteredModels(filter);
         }
     }
 }

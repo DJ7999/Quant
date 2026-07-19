@@ -90,7 +90,7 @@ class MlWorker:
     
             # Example: Assign them back to the database columns before saving!
             payload.ModelReference = file_path
-            payload.Metrics = metrics  # If your table has a JSONB or string column for metrics
+            payload.ModelMetrics = metrics  # Correct column name is ModelMetrics!
             self._update_task_status(payload, 2)  # 2 = Completed
             logger.info("Task completed successfully.")
         except Exception as e:
