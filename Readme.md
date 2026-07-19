@@ -12,6 +12,12 @@ A production-grade multi-language quantitative trading system built on real NSE 
 - 🔮 Phase 4: Walk-Forward Backtesting (Planned)
 - 🔮 Phase 5: Paper Trading (Planned)
 
+## Key Technical Highlights
+- C++ calculation engine processing records with 4 parallel workers
+- ~100 thousand NSE historical options records across 3 years
+- Async job queue pattern for ML training (no blocking)
+- Statistical validation via t-test (p-value) per regime per strategy
+
 ## Architecture
 ![System Architecture](Info/HLD%20Architectuure.drawio.svg)
 
