@@ -65,7 +65,7 @@ class Repository:
                   AND oh."UnderlyingValue" IS NOT NULL
                   AND oh."Date" >= :start 
                   AND oh."Date" <= :end
-                  AND (:option_type IS NULL OR oc."OptionType" = :option_type)
+                  AND (CAST(:option_type AS INTEGER) IS NULL OR oc."OptionType" = :option_type)
             )
             SELECT 
                 "Date", "Close", "UnderlyingValue", "Expiry", "StrikePrice", "OptionType", "Rate", "ImpliedVolatility"

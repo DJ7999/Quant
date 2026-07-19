@@ -64,15 +64,72 @@ class ConfigHypothesisProcessor:
                 variant_value_matrix[current_date][active_pos.EntryDate] = active_pos.TotalCurrentValue
         
         position_values_df = pd.DataFrame.from_dict(variant_value_matrix, orient="index")
-        logger
-        # Calculate daily capital simple returns
-        returns_series = position_values_df.pct_change(1).mean(axis=1).fillna(0.0)
+        
+        # Calculate daily capital simple returns:
+        # For each position, we calculate the daily change in value, and divide by the calculated CBOE margin/risk capital base
+        daily_returns_dict = {}
+        for col_name in position_values_df.columns:
+            col = position_values_df[col_name]
+            valid_vals = col.dropna()
+            if not valid_vals.empty:
+                entry_val = valid_vals.iloc[0]
+                
+                # Locate the actual StrategyPositionInstance to extract legs and calculate margin capital base
+                # col_name represents the position's EntryDate
+                pos = next((p for p in positions if p.EntryDate == col_name), None)
+                denom = self._calculate_capital_base(pos, entry_val)
+                
+                daily_returns_dict[col_name] = col.diff() / denom
+            else:
+                daily_returns_dict[col_name] = pd.Series(index=position_values_df.index, dtype=float)
+        
+        daily_returns_df = pd.DataFrame(daily_returns_dict, index=position_values_df.index)
+        returns_series = daily_returns_df.mean(axis=1).fillna(0.0)
         self.regim_labeled_df[strategy_config.VariantId] = returns_series
 
-        # Generate metrics data object representing backtest performance
-        #help me calculate metrics_dto = VariantEvaluationResultDto(
         metrics_dto = self._get_variant_metrics(strategy_config.VariantId, self.regim_labeled_df[["ClusterLabel", strategy_config.VariantId]].copy())
         return returns_series, metrics_dto
+
+    def _calculate_capital_base(self, position, entry_val: float) -> float:
+        """
+        Calculates a realistic margin/capital requirement for the strategy position
+        based on CBOE margin rules. This prevents division-by-epsilon traps (near-zero premiums)
+        which cause artificial return spikes.
+        """
+        if not position or not position.Legs:
+            return abs(entry_val) if abs(entry_val) > 1e-5 else 1.0
+
+        net_entry_val = abs(entry_val)
+
+        # Extract strikes and long/short flags
+        strikes = [leg.StrikePrice for leg in position.Legs if getattr(leg, 'StrikePrice', None) is not None]
+        has_short = any(not leg.IsLong for leg in position.Legs)
+        has_long = any(leg.IsLong for leg in position.Legs)
+
+        # 1. Spread Margin (strike width difference)
+        spread_margin = 0.0
+        if len(strikes) >= 2 and has_short and has_long:
+            spread_margin = max(strikes) - min(strikes)
+
+        # 2. Naked Short Margin (10% of strike price as proxy for margin required)
+        short_option_margin = 0.0
+        for leg in position.Legs:
+            if not leg.IsLong:
+                short_option_margin += getattr(leg, 'StrikePrice', 100.0) * 0.10
+
+        # Apply CBOE margin allocation rules:
+        if has_short and has_long:
+            # Spread (hedged): margin required is maximum of premium paid and strike difference
+            capital = max(net_entry_val, spread_margin)
+        elif has_short:
+            # Naked short option: margin required is short option margin
+            capital = max(net_entry_val, short_option_margin)
+        else:
+            # Pure long option: capital base is just the premium paid
+            capital = net_entry_val
+
+        # Ensure we have a sensible absolute floor ($0.50) to prevent division by zero/epsilon
+        return max(capital, 0.50)
     
     def _get_variant_metrics(self,variant_id: str, variant_data_df: pd.DataFrame) -> VariantEvaluationResultDto:
         
@@ -80,12 +137,18 @@ class ConfigHypothesisProcessor:
         regime_col = 'ClusterLabel'
         variant_data_df['InstanceBlock'] = (variant_data_df[regime_col] != variant_data_df[regime_col].shift()).cumsum()
         regime_profiles: Dict[int, RegimeProfileDto] = {}
+        regime_aggregates: Dict[int, PureMetricsDto] = {}
+        
         for regime_id, group_df in variant_data_df.groupby(regime_col):
+            # A. Calculate aggregated metrics on all days of this regime combined
+            combined_returns = group_df[returns_col]
+            regime_aggregates[int(regime_id)] = self._calculate_metrics(combined_returns)
+            
+            # B. Calculate fragmented instance metrics
             instances: List[RegimeInstanceDto] = []
             for instance_id, instance_df in group_df.groupby('InstanceBlock'):
                 start_date = instance_df.index.min().date()
                 end_date = instance_df.index.max().date()
-                # Placeholder for metrics calculation; replace with actual logic
                 metrics = self._calculate_metrics(instance_df[returns_col])
                 instance_dto = RegimeInstanceDto(
                     InstanceId=instance_id,
@@ -94,12 +157,12 @@ class ConfigHypothesisProcessor:
                     Metrics=metrics
                 )
                 instances.append(instance_dto)
-            regime_profiles[regime_id] = RegimeProfileDto(Instances=instances)
-
+            regime_profiles[int(regime_id)] = RegimeProfileDto(Instances=instances)
 
         evaluation_result = VariantEvaluationResultDto(
             VariantId=variant_id,
-            RegimeProfiles=regime_profiles
+            RegimeProfiles=regime_profiles,
+            RegimeAggregates=regime_aggregates
         )
         return evaluation_result
     
@@ -111,7 +174,7 @@ class ConfigHypothesisProcessor:
         # 1. Edge Case Guard: Empty or single data point tracking blocks
         if returns_series.empty or len(returns_series) < 2:
             return PureMetricsDto(
-                Cagr=float(returns_series.sum()) if not returns_series.empty else 0.0,
+                Cagr=float(returns_series.mean() * 252.0) if not returns_series.empty else 0.0,
                 Sharpe=0.0,
                 Drawdown=0.0,
                 Sigma=0.0,
@@ -130,11 +193,8 @@ class ConfigHypothesisProcessor:
         equity_curve = (1.0 + returns_series).cumprod()
         total_return = equity_curve.iloc[-1] - 1.0 if not equity_curve.empty else 0.0
 
-        # 3. Safe CAGR Processing (Only annualize if window spans at least 30 trading days)
-        if years > (30.0 / 252.0) and (total_return + 1.0) > 0:
-            cagr = float((total_return + 1.0) ** (1.0 / years) - 1.0)
-        else:
-            cagr = float(total_return)  # Fall back to simple absolute return for short durations
+        # 3. Annualized Simple Average Return (Approach 2)
+        cagr = float(returns_series.mean() * 252.0) if not returns_series.empty else 0.0
 
         # 4. Safe Sigma & Sharpe Logic (Guard against absolute zero variance)
         daily_std = returns_series.std()

@@ -34,9 +34,25 @@ class MlOrchastrator:
             raise ValueError(f"NaN values detected within feature matrix columns: {null_columns}")
         
         trained_model = self.trainer.train_model(features=features, params= model_params)
+        if trained_model is None:
+            # Fallback to model strategy's property
+            strategy = getattr(self.trainer, 'model_strategy', None)
+            if strategy:
+                trained_model = strategy.trainedModel() if callable(strategy.trainedModel) else strategy.trainedModel
+
         file_path = self._save_model(model, trained_model)
         logger.info(f"Trained model saved at {file_path}")
-        return file_path,trained_model["metrics"]
+        
+        # Safely extract metrics
+        metrics = None
+        if isinstance(trained_model, dict):
+            metrics = trained_model.get("metrics")
+        elif isinstance(trained_model, list) and len(trained_model) > 0:
+            first_item = trained_model[0]
+            if isinstance(first_item, dict):
+                metrics = first_item.get("metrics")
+
+        return file_path, metrics
 
     def _save_model(self, model:MlModels, trained_model:dict[str,Any]):
         logger.info("saving model")

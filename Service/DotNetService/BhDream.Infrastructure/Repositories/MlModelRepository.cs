@@ -1,9 +1,10 @@
-﻿using BhDream.Application.Abstractions.Repositories;
+using BhDream.Application.Abstractions.Repositories;
 using BhDream.Domain.Entities;
 using BhDream.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace BhDream.Infrastructure.Repositories
@@ -65,6 +66,100 @@ namespace BhDream.Infrastructure.Repositories
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching ML model execution with ID: {Id}", id);
+                throw;
+            }
+        }
+
+        public async Task<List<MlModel>> GetFilteredModels(MlModel model)
+        {
+            try
+            {
+                string sql = "SELECT * FROM ml_models WHERE 1=1";
+                var parameters = new List<object>();
+
+                if (!string.IsNullOrEmpty(model.ModelName))
+                {
+                    sql += $" AND \"ModelName\" = {{{parameters.Count}}}";
+                    parameters.Add(model.ModelName);
+                }
+
+                if (model.StartDateTime != default)
+                {
+                    sql += $" AND \"StartDateTime\" >= {{{parameters.Count}}}";
+                    parameters.Add(model.StartDateTime);
+                }
+
+                if (model.EndDateTime != default)
+                {
+                    sql += $" AND \"EndDateTime\" <= {{{parameters.Count}}}";
+                    parameters.Add(model.EndDateTime);
+                }
+
+                if (!string.IsNullOrEmpty(model.Features))
+                {
+                    if (model.Features.Contains('|'))
+                    {
+                        var parts = model.Features.Split('|');
+                        foreach (var part in parts)
+                        {
+                            if (part.Contains(':'))
+                            {
+                                var pParts = part.Split(':');
+                                var pKey = pParts[0];
+                                var pVal = pParts[1];
+                                sql += $" AND (CAST(\"Features\" AS text) LIKE {{{parameters.Count}}} OR CAST(\"Features\" AS text) LIKE {{{parameters.Count + 1}}} OR CAST(\"Features\" AS text) LIKE {{{parameters.Count + 2}}} OR CAST(\"Features\" AS text) LIKE {{{parameters.Count + 3}}})";
+                                parameters.Add($"%\"{pKey}\":{pVal}%");
+                                parameters.Add($"%\"{pKey}\": {pVal}%");
+                                parameters.Add($"%\"{pKey}\":\"{pVal}\"%");
+                                parameters.Add($"%\"{pKey}\": \"{pVal}\"%");
+                            }
+                            else
+                            {
+                                sql += $" AND CAST(\"Features\" AS text) LIKE {{{parameters.Count}}}";
+                                parameters.Add($"%{part}%");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        sql += $" AND CAST(\"Features\" AS text) LIKE {{{parameters.Count}}}";
+                        parameters.Add($"%{model.Features}%");
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(model.Parameters))
+                {
+                    if (model.Parameters.Contains(':'))
+                    {
+                        var parts = model.Parameters.Split(':');
+                        var pKey = parts[0];
+                        var pVal = parts[1];
+                        sql += $" AND (CAST(\"Parameters\" AS text) LIKE {{{parameters.Count}}} OR CAST(\"Parameters\" AS text) LIKE {{{parameters.Count + 1}}} OR CAST(\"Parameters\" AS text) LIKE {{{parameters.Count + 2}}} OR CAST(\"Parameters\" AS text) LIKE {{{parameters.Count + 3}}})";
+                        parameters.Add($"%\"{pKey}\":{pVal}%");
+                        parameters.Add($"%\"{pKey}\": {pVal}%");
+                        parameters.Add($"%\"{pKey}\":\"{pVal}\"%");
+                        parameters.Add($"%\"{pKey}\": \"{pVal}\"%");
+                    }
+                    else
+                    {
+                        sql += $" AND CAST(\"Parameters\" AS text) LIKE {{{parameters.Count}}}";
+                        parameters.Add($"%{model.Parameters}%");
+                    }
+                }
+
+                sql += $" AND \"Status\" = {{{parameters.Count}}}";
+                parameters.Add((int)model.Status);
+
+                var results = await _dbContext.MlModels
+                    .FromSqlRaw(sql, parameters.ToArray())
+                    .ToListAsync();
+
+                _logger.LogInformation("Retrieved {Count} ML models matching the filter criteria.", results.Count);
+                return results;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving filtered ML models.");
                 throw;
             }
         }

@@ -69,6 +69,10 @@ class FeatureExtractor:
             working_df['Close'] = pd.to_numeric(working_df['Close'], errors='coerce').astype(float)
         if 'ImpliedVolatility' in working_df.columns:
             working_df['ImpliedVolatility'] = pd.to_numeric(working_df['ImpliedVolatility'], errors='coerce').astype(float)
+        if 'StrikePrice' in working_df.columns:
+            working_df['StrikePrice'] = pd.to_numeric(working_df['StrikePrice'], errors='coerce').astype(float)
+        if 'Rate' in working_df.columns:
+            working_df['Rate'] = pd.to_numeric(working_df['Rate'], errors='coerce').astype(float)
             
         # 💡 FIXED OPERATIONAL ORDER: Crucial chronological sort happens for BOTH options and asset matrices
         working_df.sort_values('Date', inplace=True)

@@ -9,7 +9,7 @@ from hypothesis_evaluation_service.EvaluationOrchestrator import EvaluationOrche
 # Create a router instead of an app instance
 logger = logging.getLogger(__name__)
 router = APIRouter()
-@router.post("/hypothesis", response_model=dict)
+@router.post("", response_model=dict)
 async def hypothesis_executer(payload: HypothesisRequestDto):
     logger.info(f"Received Hypothesis Request for ModelGuid: {payload.ModelGuid} with {len(payload.Strategies)} strategy configurations.")
     orchestrator = EvaluationOrchestrator()

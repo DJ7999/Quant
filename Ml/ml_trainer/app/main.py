@@ -52,7 +52,7 @@ async def lifespan(app: FastAPI):
     main_logger.info("Initilizing worker for ML training orchestration...")
 
     worker = MlWorker(check_interval=5)
-    #worker.start()
+    worker.start()
 
     main_logger.info("Ready for other extension tasks!")
 
