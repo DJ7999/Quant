@@ -9,6 +9,7 @@ $ProjectRoot = Get-Item -Path "."
 $DotNetDir = Join-Path $ProjectRoot.FullName "Service\DotNetService\BhDream.WebAPI"
 $PythonDir = Join-Path $ProjectRoot.FullName "Ml\ml_trainer"
 $FrontendDir = Join-Path $ProjectRoot.FullName "Ui\quant"
+$CppDir = Join-Path $ProjectRoot.FullName "Service\CppGreeksEngine\GreeksEngine\x64\Debug"
 
 # 1. Start .NET Backend
 Write-Host "1. Starting Backend WebAPI (.NET)..." -ForegroundColor Yellow
@@ -22,7 +23,11 @@ Start-Process powershell -WorkingDirectory (Join-Path $PythonDir "app") -Argumen
 Write-Host "3. Starting Frontend App (Vite/React)..." -ForegroundColor Yellow
 Start-Process powershell -WorkingDirectory $FrontendDir -ArgumentList "-NoExit", "-Command", "npm run dev"
 
+# 4. Start C++ Greeks Engine
+Write-Host "4. Starting Greeks Engine (C++)..." -ForegroundColor Yellow
+Start-Process powershell -WorkingDirectory $CppDir -ArgumentList "-NoExit", "-Command", ".\GreeksEngine.exe"
+
 Write-Host "----------------------------------------" -ForegroundColor Green
-Write-Host "✅ All 3 services launched in separate windows!" -ForegroundColor Green
+Write-Host "✅ All 4 services launched in separate windows!" -ForegroundColor Green
 Write-Host "You can close this orchestrator window." -ForegroundColor Gray
 Read-Host "Press Enter to exit..."

@@ -5,6 +5,10 @@ A production-grade multi-language quantitative trading system built on real NSE 
 ## Tech Stack
 .NET (C#) | C++ | Python | PostgreSQL | ZeroMQ | React
 
+## 📺 Project Walkthrough
+
+[![Quantitative Options Trading Research System Video Walkthrough](https://img.youtube.com/vi/qtNZRHZ3Qw4/maxresdefault.jpg)](https://youtu.be/qtNZRHZ3Qw4)
+
 ## Phases
 - ✅ Phase 1: Options Greeks & IV Calculator (C++ engine)
 - ✅ Phase 2: Regime Detection ML Pipeline (K-Means, HMM)  

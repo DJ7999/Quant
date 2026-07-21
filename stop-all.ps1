@@ -8,7 +8,8 @@ Write-Host "----------------------------------------" -ForegroundColor Red
 Stop-Process -Name "BhDream.WebAPI" -ErrorAction SilentlyContinue
 Stop-Process -Name "python" -ErrorAction SilentlyContinue
 Stop-Process -Name "node" -ErrorAction SilentlyContinue
+Stop-Process -Name "GreeksEngine" -ErrorAction SilentlyContinue
 
 Write-Host "----------------------------------------" -ForegroundColor Green
-Write-Host "✅ Stopped Backend (.NET), Worker (Python), and UI (Node/React) successfully!" -ForegroundColor Green
+Write-Host "✅ Stopped Backend (.NET), Worker (Python), Greeks Engine (C++), and UI (Node/React) successfully!" -ForegroundColor Green
 Read-Host "Press Enter to exit..."
